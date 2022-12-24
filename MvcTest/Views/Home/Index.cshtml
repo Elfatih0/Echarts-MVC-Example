@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">ECharts</h1>
+    
+</div>
+<div id="main" style="width: 600px;height:400px;"></div>
+<div id="main2" style="width: 600px;height:400px;"></div>
+
+@section Scripts{
+    <script src="~/lib/echart/echarts.min.js"></script>
+    
+    <script>        
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Home/GetAccessFrom'
+            }).done(function (result) {
+                if (result != null) {
+                    var options = {
+                        title: {
+                            text: result.title,
+                            subtext: result.subTitle,
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left'
+                        },
+                        series: [
+                            {
+                                name: result.subTitle,
+                                type: 'pie',
+                                radius: '50%',
+                                data: result.series,                                
+                                emphasis: {
+                                    itemStyle: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    };
+                    var myChart2 = echarts.init(document.getElementById('main2'));
+                    myChart2.setOption(options);
+                }
+            });
+
+            $.ajax({
+                url: '/Home/GetSales'
+            }).done(function (result) {
+                if (result != null) {
+                    var myChart = echarts.init(document.getElementById('main'));
+                    var names = [];
+                    var values = [];
+                    var series = result.series;
+                    for (var i = 0; i < series.length; i++) {
+                        names.push(series[i].name);
+                        values.push(series[i].value);
+                    }
+                    var option = {
+                        title: {
+                            text: result.title,
+                            subtext: result.subTitle
+                        },
+                        tooltip: {},
+                        legend: {
+                            data: result.legend
+                        },
+                        xAxis: {
+                            data: names
+                        },
+                        yAxis: {},
+                        series: [
+                            {
+                                name: result.subTitle,
+                                type: 'bar',
+                                data: values
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                }
+            });
+        });
+    </script>
+    
+}
